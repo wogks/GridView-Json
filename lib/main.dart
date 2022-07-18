@@ -12,13 +12,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.yellow
-      ),
+      theme: ThemeData(primarySwatch: Colors.yellow),
       home: const MyHomePage(),
     );
   }
 }
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
@@ -35,7 +34,20 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         children: [
-          TextField()
+          Padding(
+            padding: EdgeInsets.all(20.0),
+            child: TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+              suffixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+                labelText: 'Search',
+                hintText: 'Search',
+                
+                
+              ),
+            ),
+          )
         ],
       ),
     );
