@@ -26,13 +26,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Map<String,dynamic>> images = [];
+  List<Map<String, dynamic>> images = [];
+  
   @override
   void initState() {
-   
     super.initState();
     images = getImages();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,23 +55,21 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Expanded(
             child: GridView.builder(
-              itemCount: images.length,
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                itemCount: images.length,
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 200,
-                 
-                  
-                  ),
-              itemBuilder: (BuildContext context, int index) {
-              Map<String,dynamic> image = images[index];
-              return Image.network(image['previewURL']);
-            }),
+                ),
+                itemBuilder: (BuildContext context, int index) {
+                  Map<String, dynamic> image = images[index];
+                  return Image.network(image['previewURL'],width: 200,height: 200,fit: BoxFit.cover,);
+                }),
           ),
         ],
       ),
     );
   }
 
-  List<Map<String,dynamic>> getImages(){
+  List<Map<String, dynamic>> getImages() {
     return data['hits'];
   }
 }
