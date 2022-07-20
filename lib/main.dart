@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -26,14 +29,18 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Map<String, dynamic>> images = [];
-  
+  List<Picture> images = [];
+
   @override
   void initState() {
     super.initState();
-    images = getImages();
+    initData();
   }
+  Future initData() async {
+    images = await getImages();
 
+    setState(() {});
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         children: [
-          Padding(
+          const Padding(
             padding: EdgeInsets.all(20.0),
             child: TextField(
               decoration: InputDecoration(
@@ -54,27 +61,65 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Expanded(
-            child: GridView.builder(
-                itemCount: images.length,
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 200,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  Map<String, dynamic> image = images[index];
-                  return Image.network(image['previewURL'],width: 200,height: 200,fit: BoxFit.cover,);
-                }),
+            child: images.isEmpty
+                ? const Center(child: CircularProgressIndicator())
+                : GridView.builder(
+              itemCount: images.length,
+              gridDelegate:
+              const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+              ),
+              itemBuilder: (BuildContext context, int index) {
+                Picture image = images[index];
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.network(
+                    image.previewURL,
+                    fit: BoxFit.cover,
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
     );
   }
+Future<List<Picture>> getImages() async {
+    await Future.delayed(const Duration(seconds: 2));
 
-  List<Map<String, dynamic>> getImages() {
-    return data['hits'];
+    String jsonString = data;
+
+    Map<String, dynamic> json = jsonDecode(jsonString);
+    Iterable hits = json['hits'];
+    return hits.map((e) => Picture.fromJson(e)).toList();
+  }
+
+  
+}
+
+class Picture {
+  final String previewURL;
+  final String tags;
+
+  Picture({
+    required this.previewURL,
+    required this.tags,
+  });
+
+  factory Picture.fromJson(Map<String, dynamic> json) {
+    return Picture(
+      previewURL: json['previewURL'] as String,
+      tags: json['tags'] as String,
+    );
   }
 }
 
-Map<String, dynamic> data = {
+  
+
+String data = """{
   "total": 8737,
   "totalHits": 500,
   "hits": [
@@ -658,41 +703,4 @@ Map<String, dynamic> data = {
           "https://cdn.pixabay.com/user/2021/02/06/02-19-29-704_250x250.png"
     }
   ]
-};
-
-class ShowGridview extends StatefulWidget {
-  final List<Map<String, dynamic>> images;
-  const ShowGridview(this.images, {Key? key}) : super(key: key);
-
-  @override
-  State<ShowGridview> createState() => _ShowGridviewState();
-}
-
-class _ShowGridviewState extends State<ShowGridview> {
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-        ),
-        itemCount: widget.images.length,
-        itemBuilder: (BuildContext context, int index) {
-          Map<String, dynamic> image = widget.images[index];
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(width: 1.0),
-              ),
-              child: Image.network(
-                image['previewURL'],
-                fit: BoxFit.cover,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
+}""";
